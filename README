@@ -1,0 +1,10 @@
+To use lucky.rb, you'll need to have an API key to use the AJAX API.
+You can get one here: http://code.google.com/apis/ajaxsearch/signup.html
+
+Create ~/.google_key:
+line 1: API key
+line 2: the "website URL" you entered when signing up
+
+Then you should be good to go.
+
+Lots more options forthcoming.
