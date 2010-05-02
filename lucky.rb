@@ -4,6 +4,14 @@ require 'uri'
 require 'json'
 require 'optparse'
 
+def read_credentials(path)
+  File.open(File.expand_path(path)) do |auth_info|
+    goog_key = auth_info.gets
+    referrer = auth_info.gets
+    return goog_key+':'+referrer
+  end
+end
+
 options = {}
 optparse = OptionParser.new do|opts|
   opts.banner = "Usage: lucky.rb [options] query1 query2 ..."
@@ -12,6 +20,12 @@ optparse = OptionParser.new do|opts|
   credentials_text = 'A file that contains your Google API key and referrer URL'
   opts.on( '--credentials FILE', credentials_text) do|file|
     options[:keypath] = file
+  end
+
+  options[:apikey] = nil
+  key_text = 'Your Google API key and referrer URL'
+  opts.on( '-k KEY:URL' '--key KEY:URL', key_text) do |key|
+    options[:apikey] = key
   end
 
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -23,18 +37,12 @@ end
 optparse.parse!
 
 api_url = 'http://ajax.googleapis.com/ajax/services/search/web'
-goog_key = ''
-referrer = ''
-
-File.open(File.expand_path(options[:keypath])) do |auth_info|
-  begin
-    goog_key = auth_info.gets
-    referrer = auth_info.gets
-  rescue
-    puts 'Error in auth file. Did you forget to specify a custom location?'
-    exit
-  end
-end
+apikey = options[:apikey]
+apikey ||= read_credentials(options[:keypath])
+m = /^([^:]*):(.*?)$/.match(apikey)
+exit "Couldn't get auth data" if m.nil?
+goog_key = m[1]
+referrer = m[2]
 
 ARGV.each do |keyword|
   keyword = keyword.gsub(' ','+')
@@ -47,3 +55,4 @@ ARGV.each do |keyword|
   title = response['responseData']['results'][0]['title'].gsub(/<\/?[^>]*>/,'')
   puts '['+title+']('+link+')'
 end
+
