@@ -1,12 +1,16 @@
-lucky.rb outputs a Markdown-formatted link to the top hit on Google for a given search string. I wrote it to use in MacOS X with Automator + Services so that I could have a global keyboard shortcut that would replace a string with its "I'm Feeling Lucky" result-- handy for writing blog posts, comments, etc.
+lucky.rb outputs a link to the top hit on Google for a given search string. I wrote it to use in MacOS X with Automator + Services so that I could have a global keyboard shortcut that would replace a string with its "I'm Feeling Lucky" result-- handy for writing blog posts, comments, etc.
+
+Usage: lucky.rb [options] query1 query2 ...
+        --credentials FILE           A file containing a Google API key and referrer URL
+    -f, --format FORMAT              The output format (url, html, or markdown)
+    -k, --key KEY:URL                API key and referrer URL (overrides credentials file)
+    -h, --help                       Display this screen
+
 
 To use lucky.rb, you'll need to have an API key to use the AJAX API.
 You can get one here: http://code.google.com/apis/ajaxsearch/signup.html
 
-Create ~/.google_key:
+By default, lucky.rb looks for your credentials in ~/.google_key in the following format:
 line 1: API key
 line 2: the "website URL" you entered when signing up
 
-Then you should be good to go.
-
-If for some reason you don't want to store your key in that location, you can use the --credentials FILE command line option to point to a different path. If you don't want to keep the key in a separate file at all, you can use "-k KEY:URL" or "--key KEY:URL" to enter them on the command line.

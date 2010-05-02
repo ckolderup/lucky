@@ -17,14 +17,20 @@ optparse = OptionParser.new do|opts|
   opts.banner = "Usage: lucky.rb [options] query1 query2 ..."
 
   options[:keypath] = '~/.google_key'
-  credentials_text = 'A file that contains your Google API key and referrer URL'
+  credentials_text = 'A file containing a Google API key and referrer URL'
   opts.on( '--credentials FILE', credentials_text) do|file|
     options[:keypath] = file
   end
 
+  options[:format] = 'url'
+  format_text = 'The output format (url, html, or markdown)'
+  opts.on( '-f FORMAT', '--format FORMAT', format_text) do |format|
+    options[:format] = format
+  end
+
   options[:apikey] = nil
-  key_text = 'Your Google API key and referrer URL'
-  opts.on( '-k KEY:URL' '--key KEY:URL', key_text) do |key|
+  key_text = 'Your Google API key and referrer URL (overrides credentials file)'
+  opts.on( '-k KEY:URL', '--key KEY:URL', key_text) do |key|
     options[:apikey] = key
   end
 
@@ -41,8 +47,7 @@ apikey = options[:apikey]
 apikey ||= read_credentials(options[:keypath])
 m = /^([^:]*):(.*?)$/.match(apikey)
 exit "Couldn't get auth data" if m.nil?
-goog_key = m[1]
-referrer = m[2]
+(goog_key, referrer) = m[1..2]
 
 ARGV.each do |keyword|
   keyword = keyword.gsub(' ','+')
@@ -53,6 +58,16 @@ ARGV.each do |keyword|
   response = JSON.parse(http.request(request).body)
   link = response['responseData']['results'][0]['url']
   title = response['responseData']['results'][0]['title'].gsub(/<\/?[^>]*>/,'')
-  puts '['+title+']('+link+')'
+  
+  case options[:format]
+  when 'url'
+    puts link
+  when 'html'
+    puts '<a href="'+link+'">'+title+'</a>'
+  when 'markdown'
+    puts '['+title+']('+link+')'
+  else
+    puts 'Unrecognized output format.'
+  end
 end
 
