@@ -45,9 +45,8 @@ optparse.parse!
 api_url = 'http://ajax.googleapis.com/ajax/services/search/web'
 apikey = options[:apikey]
 apikey ||= read_credentials(options[:keypath])
-m = /^([^:]*):(.*?)$/.match(apikey)
-exit "Couldn't get auth data" if m.nil?
-(goog_key, referrer) = m[1..2]
+(apikey, goog_key, referrer) = */^([^:]*):(.*?)$/.match(apikey)
+exit "Couldn't get auth data" if apikey.nil?
 
 ARGV.each do |keyword|
   keyword = keyword.gsub(' ','+')
